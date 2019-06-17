@@ -13,14 +13,12 @@ import config
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
-def get_map():
+def get_map(draw=False):
     g = Graph()
-    g.add_edge("rua1", "rua2")
-    g.add_edge("rua2", "rua5")
-    g.add_edge("rua2", "rua4")
-    g.add_edge("rua4", "rua5")
-    g.add_edge("rua4", "rua3")
-    g.add_edge("rua5", "rua3")
+    for node1, node2 in config.map_connections:
+        g.add_edge(node1, node2)
+    if draw:
+        g.draw_graph()
     return g
 
 
@@ -60,14 +58,13 @@ def main(algorithms, n_simulated_paths):
     random_cars = get_random_paths(map, n_simulated_paths)
 
     ncars_by_route = get_ncars_by_route(random_cars)
-    # print(map)
-    print(map.graph)
+    # print(map.graph)
     # print(ncars_by_route)
 
     for algo_name in algorithms:
         logging.info("Computing {}...".format(algo_name))
         algo = config.algorithm_class[algo_name](map, ncars_by_route)
-        algo_route = algo.get_route("rua1", "rua3")
+        algo_route = algo.get_route("source", "dest")
         logging.info("Route: {}".format(algo_route))
         logging.info("Time taken to complete the route: {}".format(get_total_route_time(algo_route, ncars_by_route)))
 

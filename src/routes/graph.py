@@ -73,6 +73,6 @@ class Graph:
         for node1, v in self.graph.items():
             for node2 in v:
                 G.add_edge(node1, node2)
-        pos = nx.spring_layout(G)
-        nx.draw(G, pos)
+        pos = nx.circular_layout(G)
+        nx.draw(G, pos, with_labels=True)
         plt.show()

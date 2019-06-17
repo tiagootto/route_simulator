@@ -18,7 +18,10 @@ class Dijkstra(BaseAlgorithm):
     def get_edges(self):
         edges = []
         for street1, adjacent_streets in self.map.graph.items():
-            cars_on_street1 = sum(self.ncars_by_street[street1])
+            if street1 in self.ncars_by_street.columns.values.tolist():
+                cars_on_street1 = sum(self.ncars_by_street[street1])
+            else:
+                cars_on_street1 = 0
             for street2 in adjacent_streets:
                 edge = (street1, street2, cars_on_street1)
                 edges.append(edge)
