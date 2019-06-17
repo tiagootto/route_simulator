@@ -53,27 +53,32 @@ def get_ncars_by_route(car_paths):
     return res
 
 
-def main(algorithms, n_simulated_paths):
+def main(algorithms, n_simulations):
     map = get_map()
-    random_cars = get_random_paths(map, n_simulated_paths)
 
-    ncars_by_route = get_ncars_by_route(random_cars)
-    # print(map.graph)
-    # print(ncars_by_route)
+    res = pd.DataFrame(columns=algorithms)
+    for i in range(n_simulations):
+        random_cars = get_random_paths(map, config.NUMBER_NORMAL_CARS)
+        ncars_by_route = get_ncars_by_route(random_cars)
+        i_res = []
+        for algo_name in algorithms:
+            logging.info("Computing {}...".format(algo_name))
+            algo = config.algorithm_class[algo_name](map, ncars_by_route)
+            algo_route = algo.get_route("source", "dest")
+            total_route_time = get_total_route_time(algo_route, ncars_by_route)
+            logging.info("Route: {}".format(algo_route))
+            logging.info("Time taken to complete the route: {}".format(total_route_time))
 
-    for algo_name in algorithms:
-        logging.info("Computing {}...".format(algo_name))
-        algo = config.algorithm_class[algo_name](map, ncars_by_route)
-        algo_route = algo.get_route("source", "dest")
-        logging.info("Route: {}".format(algo_route))
-        logging.info("Time taken to complete the route: {}".format(get_total_route_time(algo_route, ncars_by_route)))
+            i_res.append(total_route_time)
+        res = res.append(pd.Series(i_res, index=algorithms), ignore_index=True)
+    print(res.apply(pd.to_numeric).describe())
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("algorithm", nargs='?', default=config.AVAILABLE_ALGORITHMS,
                         help="Algorithm that you want to try it")
-    parser.add_argument("simulated_paths",  nargs='?', type=int, default=config.NUMBER_SIMULATED_PATHS,
+    parser.add_argument("number_simulations",  nargs='?', type=int, default=config.NUMBER_SIMULATIONS,
                         help="Number of simulated paths")
     args = parser.parse_args()
 
@@ -84,6 +89,7 @@ if __name__ == "__main__":
         raise NotImplementedError(msg_error)
     else:
         algorithm_to_simulate = [args.algorithm]
-    simulated_paths = args.simulated_paths if args.simulated_paths else config.NUMBER_SIMULATED_PATHS
 
-    main(algorithm_to_simulate, simulated_paths)
+    n_simulations = args.number_simulations if args.number_simulations else config.NUMBER_SIMULATIONS
+
+    main(algorithm_to_simulate, n_simulations)

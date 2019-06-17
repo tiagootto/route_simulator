@@ -41,6 +41,9 @@ class Genetic(BaseAlgorithm):
         return self.pop.head(elit_size)
 
     def get_mutate_population(self, mathingpool, mutate_rate):
+        if mathingpool.shape[1] <= 2:
+            # impossible create a new generation
+            return mathingpool
         mutate_population = []
         for i in range(mathingpool.shape[1]-1):
             if random.random() < mutate_rate:

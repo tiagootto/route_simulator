@@ -4,7 +4,8 @@ from algorithms.random_path import Random
 from algorithms.genetic import Genetic
 
 AVAILABLE_ALGORITHMS = ["random", "shortest", "dijkstra", "genetic"]
-NUMBER_SIMULATED_PATHS = 20
+NUMBER_NORMAL_CARS = 20
+NUMBER_SIMULATIONS = 100
 
 algorithm_class = {
     "random": Random,
